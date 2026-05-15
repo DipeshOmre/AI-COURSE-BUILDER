@@ -8,25 +8,34 @@ datasource db {
 }
 
 model Course {
-  id          String    @id @default(uuid())
-  courseId    String    @unique // A short URL-friendly ID
-  name        String    // e.g., "Fullstack Next.js"
-  category    String    // e.g., "Programming"
-  level       String    // e.g., "Beginner"
-  courseOutput Json     // We will store the AI-generated JSON outline here
-  createdAt   DateTime  @default(now())
+  id        String    @id @default(cuid())
+  courseId  String    @unique // URL ke liye
+  name      String
+  category  String
+  level     String
+  userId    String?
+  createdAt DateTime  @default(now())
   
-  // Relation: One Course has Many Chapters
-  chapters    Chapter[]
+  chapters  Chapter[]
+  quizzes   Question[] // 👈 Naya relation: Ek course ke bohot saare questions ho sakte hain
 }
 
 model Chapter {
-  id          String   @id @default(uuid())
-  courseId    String
-  name        String   // Chapter title, e.g., "Introduction to APIs"
-  youtubeId   String?  // Later, we can fetch a relevant YouTube video
-  content     String?  @db.Text // The AI-generated detailed text for the chapter
+  id        String   @id @default(cuid())
+  name      String
+  content   String
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+// 👇 Naya Model: Quiz Questions ke liye
+model Question {
+  id            String   @id @default(cuid())
+  questionText  String
+  options       String[] // Array of strings (e.g., ["A", "B", "C", "D"])
+  correctAnswer String   // The exact string of the correct option
+  explanation   String   // AI batayega ki yeh answer kyun sahi hai
   
-  // Foreign Key linking back to Course
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }

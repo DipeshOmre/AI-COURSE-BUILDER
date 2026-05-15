@@ -1,71 +1,66 @@
 // src/app/page.tsx
-"use client";
-import { useState } from "react";
-import { createCourseAction } from "@/src/actions/course-actions";
+// 👈 Notice: Humne "use client" hata diya hai! Yeh ab ek Server Component hai.
+import { db } from "@/src/lib/db";
+import { Sparkles, BookOpen } from "lucide-react";
+import Link from "next/link";
+import CourseForm from "../components/CourseFormPage";
 
-
-export default function Home() {
-  const [topic, setTopic] = useState("");
-  const [level, setLevel] = useState("Beginner");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleGenerateCourse = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const result = await createCourseAction(topic, level);
-
-    if (result?.error) {
-      setError(result.error);
-      setLoading(false);
-    }
-  };
+export default async function Home() {
+  // 1. Fetch the 6 most recent courses directly from the database!
+  const recentCourses = await db.course.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 6,
+  });
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-12 bg-gray-50 text-black">
-      <div className="max-w-xl w-full bg-white p-8 rounded-xl shadow-lg border">
-        <h1 className="text-3xl font-bold text-center mb-6">AI Course Builder</h1>
+    <main className="min-h-screen flex flex-col items-center p-6 relative text-white pb-24">
+      {/* Background Blurs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/30 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/30 rounded-full blur-[100px] pointer-events-none" />
 
-        <form onSubmit={handleGenerateCourse} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">What do you want to learn?</label>
-            <input
-              type="text"
-              required
-              maxLength={100}
-              placeholder="e.g., Advanced React Patterns, Machine Learning..."
-              className="w-full border p-3 rounded-md text-black"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
+      {/* Hero Section */}
+      <div className="max-w-2xl w-full relative z-10 mt-16 md:mt-24 mb-16">
+        <div className="text-center mb-10 space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-blue-400 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5" />
+            Next-Gen Learning
           </div>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white">
+            Master Any Skill with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">AI</span>
+          </h1>
+          <p className="text-slate-400 text-lg md:text-xl max-w-md mx-auto leading-relaxed">
+            Generate a personalized, comprehensive course on any topic in seconds.
+          </p>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty Level</label>
-            <select
-              className="w-full border p-3 rounded-md text-black"
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
-            >
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
-            </select>
-          </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 disabled:bg-blue-300 transition-colors"
-          >
-            {loading ? "Generating Course (This takes a few seconds)..." : "Generate Course"}
-          </button>
-        </form>
+        {/* 2. Using our newly isolated Client Component */}
+        <CourseForm />
       </div>
+
+      {/* 3. The "Recent Courses" Gallery */}
+      {recentCourses.length > 0 && (
+        <div className="max-w-5xl w-full relative z-10 mt-16 pt-16 border-t border-slate-800/50">
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2 text-slate-200">
+            <BookOpen className="w-6 h-6 text-indigo-400" />
+            Explore Community Courses
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentCourses.map((course) => (
+              <Link href={`/course/${course.courseId}`} key={course.id}>
+                <div className="group bg-slate-900/40 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full flex flex-col">
+                  <div className="text-xs font-bold text-indigo-400 mb-2 uppercase tracking-wide">
+                    {course.category} • {course.level}
+                  </div>
+                  <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2">
+                    {course.name}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -1,5 +1,6 @@
 // src/app/dashboard/page.tsx
 import { db } from "@/src/lib/db";
+import React from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";

@@ -6,6 +6,7 @@ import { Search, BarChart3, ArrowRight, Loader2, GraduationCap, CheckCircle2, Sp
 // 👇 IMPORTING THE VERCEL STREAMING HOOK
 import { experimental_useObject as useObject } from '@ai-sdk/react';
 import { saveGeneratedCourseAction } from "@/src/actions/course-actions";
+import { z } from "zod";
 
 
 export default function CourseForm() {
@@ -13,9 +14,28 @@ export default function CourseForm() {
   const [level, setLevel] = useState("Beginner");
   const [isSaving, setIsSaving] = useState(false);
 
-  // 👇 THE STREAMING ENGINE
-  const { submit, isLoading, object, error } = useObject({
+const { submit, isLoading, object, error } = useObject({
     api: '/api/generate-course',
+    // 👈 NAYA ADDITION: Frontend ko data ka shape batana
+    schema: z.object({
+      name: z.string(),
+      category: z.string(),
+      level: z.string(),
+      chapters: z.array(
+        z.object({
+          name: z.string(),
+          content: z.string(),
+        })
+      ),
+      quizzes: z.array(
+        z.object({
+          questionText: z.string(),
+          options: z.array(z.string()),
+          correctAnswer: z.string(),
+          explanation: z.string(),
+        })
+      ).optional(),
+    }),
     onFinish: async ({ object }) => {
       // Jab AI poora type kar le, tab database mein save karo
       if (object) {

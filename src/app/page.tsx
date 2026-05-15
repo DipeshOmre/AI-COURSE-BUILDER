@@ -1,9 +1,11 @@
 // src/app/page.tsx
 // 👈 Notice: Humne "use client" hata diya hai! Yeh ab ek Server Component hai.
+import React from "react";
 import { db } from "@/src/lib/db";
 import { Sparkles, BookOpen } from "lucide-react";
 import Link from "next/link";
 import CourseForm from "../components/CourseFormPage";
+import { Course } from "@prisma/client";
 
 export default async function Home() {
   // 1. Fetch the 6 most recent courses directly from the database!
@@ -46,7 +48,7 @@ export default async function Home() {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recentCourses.map((course) => (
+            {recentCourses.map((course:Course) => (
               <Link href={`/course/${course.courseId}`} key={course.id}>
                 <div className="group bg-slate-900/40 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50 hover:border-blue-500/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full flex flex-col">
                   <div className="text-xs font-bold text-indigo-400 mb-2 uppercase tracking-wide">

@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import { Sparkles } from "lucide-react";
+import React from "react";
 
 export default function Navbar() {
     // Clerk ka brain
     const { isLoaded, userId } = useAuth();
-    
+  
   return (
     <nav className="w-full border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">

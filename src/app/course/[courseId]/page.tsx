@@ -11,7 +11,7 @@ interface CoursePageProps {
     courseId: string;
   }>;
 }
-
+export const dynamic = "force-dynamic";
 export default async function CoursePage({ params }: CoursePageProps) {
   const resolvedParams = await params;
 

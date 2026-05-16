@@ -6,7 +6,7 @@ import { Sparkles, BookOpen } from "lucide-react";
 import Link from "next/link";
 import CourseForm from "../components/CourseFormPage";
 import { Course } from "@prisma/client";
-
+export const dynamic = "force-dynamic";
 export default async function Home() {
   // 1. Fetch the 6 most recent courses directly from the database!
   const recentCourses = await db.course.findMany({

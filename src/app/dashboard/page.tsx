@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, PlusCircle, Clock, Sparkles } from "lucide-react";
-
+export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   // 1. Clerk se current user ki ID nikaliye
   const { userId } = await auth();
